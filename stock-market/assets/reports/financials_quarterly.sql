@@ -8,10 +8,10 @@ description: |
   margins, returns, leverage, and growth metrics. Enriched with sector/industry.
 
 depends:
-  - stock_market_raw._income_statements
-  - stock_market_raw._balance_sheets
-  - stock_market_raw._cash_flows
-  - stock_market_raw._tickers
+  - stock_market_raw.income_statements
+  - stock_market_raw.balance_sheets
+  - stock_market_raw.cash_flows
+  - stock_market_raw.tickers
 
 materialization:
   type: table
@@ -147,21 +147,21 @@ columns:
 
 WITH income AS (
     SELECT *
-    FROM stock_market_raw._income_statements
+    FROM stock_market_raw.income_statements
     WHERE period_ending IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker, period_ending ORDER BY extracted_at DESC) = 1
 ),
 
 balance AS (
     SELECT *
-    FROM stock_market_raw._balance_sheets
+    FROM stock_market_raw.balance_sheets
     WHERE period_ending IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker, period_ending ORDER BY extracted_at DESC) = 1
 ),
 
 cashflow AS (
     SELECT *
-    FROM stock_market_raw._cash_flows
+    FROM stock_market_raw.cash_flows
     WHERE period_ending IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker, period_ending ORDER BY extracted_at DESC) = 1
 ),
@@ -228,7 +228,7 @@ joined AS (
     FROM income i
     LEFT JOIN balance b ON i.ticker = b.ticker AND i.period_ending = b.period_ending
     LEFT JOIN cashflow cf ON i.ticker = cf.ticker AND i.period_ending = cf.period_ending
-    LEFT JOIN stock_market_raw._tickers t ON i.ticker = t.ticker
+    LEFT JOIN stock_market_raw.tickers t ON i.ticker = t.ticker
 )
 
 SELECT

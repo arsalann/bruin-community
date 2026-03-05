@@ -1,5 +1,5 @@
 """@bruin
-name: stock_market_raw._tickers
+name: stock_market_raw.tickers
 type: python
 image: python:3.11
 connection: gcp-default

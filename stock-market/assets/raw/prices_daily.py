@@ -1,5 +1,5 @@
 """@bruin
-name: stock_market_raw._prices_daily
+name: stock_market_raw.prices_daily
 type: python
 image: python:3.11
 connection: gcp-default

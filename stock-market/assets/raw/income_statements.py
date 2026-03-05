@@ -1,5 +1,5 @@
 """@bruin
-name: stock_market_raw._income_statements
+name: stock_market_raw.income_statements
 type: python
 image: python:3.11
 connection: gcp-default

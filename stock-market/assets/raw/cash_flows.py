@@ -1,5 +1,5 @@
 """@bruin
-name: stock_market_raw._cash_flows
+name: stock_market_raw.cash_flows
 type: python
 image: python:3.11
 connection: gcp-default

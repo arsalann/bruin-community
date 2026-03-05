@@ -1,5 +1,5 @@
 """@bruin
-name: stock_market_raw._balance_sheets
+name: stock_market_raw.balance_sheets
 type: python
 image: python:3.11
 connection: gcp-default

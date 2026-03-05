@@ -8,8 +8,8 @@ description: |
   52-week high/low metrics, and enriches with sector/industry from tickers.
 
 depends:
-  - stock_market_raw._prices_daily
-  - stock_market_raw._tickers
+  - stock_market_raw.prices_daily
+  - stock_market_raw.tickers
 
 materialization:
   type: table
@@ -94,7 +94,7 @@ columns:
 
 WITH deduped AS (
     SELECT *
-    FROM stock_market_raw._prices_daily
+    FROM stock_market_raw.prices_daily
     WHERE date IS NOT NULL
       AND close IS NOT NULL
       AND close > 0
@@ -152,7 +152,7 @@ enriched AS (
         t.sub_industry
 
     FROM deduped p
-    LEFT JOIN stock_market_raw._tickers t ON p.ticker = t.ticker
+    LEFT JOIN stock_market_raw.tickers t ON p.ticker = t.ticker
 )
 
 SELECT
