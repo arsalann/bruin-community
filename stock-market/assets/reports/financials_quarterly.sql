@@ -1,11 +1,16 @@
 /* @bruin
+
 name: stock_market.financials_quarterly
 type: bq.sql
-connection: gcp-default
 description: |
   Joins quarterly income statements, balance sheets, and cash flow statements
   into a single analysis-ready table. Adds derived financial ratios including
   margins, returns, leverage, and growth metrics. Enriched with sector/industry.
+connection: gcp-default
+
+materialization:
+  type: table
+  strategy: create+replace
 
 depends:
   - stock_market_raw.income_statements
@@ -13,135 +18,290 @@ depends:
   - stock_market_raw.cash_flows
   - stock_market_raw.tickers
 
-materialization:
-  type: table
-  strategy: create+replace
+secrets:
+  - key: gcp-default
+    inject_as: gcp-default
+
+tags:
+  - finance
+  - financials
+  - quarterly
+  - fundamental_analysis
+  - equity_research
+  - financial_reporting
+  - public_companies
 
 columns:
   - name: ticker
-    type: VARCHAR
+    type: STRING
     description: Stock ticker symbol
     primary_key: true
     nullable: false
+    checks:
+      - name: not_null
   - name: period_ending
     type: DATE
     description: Fiscal quarter end date
     primary_key: true
     nullable: false
+    checks:
+      - name: not_null
   - name: fiscal_year
     type: INTEGER
     description: Fiscal year
+    checks:
+      - name: not_null
+      - name: min
+        value: 2020
+      - name: max
+        value: 2030
   - name: fiscal_quarter
     type: INTEGER
     description: Fiscal quarter (1-4)
+    checks:
+      - name: not_null
+      - name: min
+        value: 1
+      - name: max
+        value: 4
   - name: company_name
-    type: VARCHAR
+    type: STRING
     description: Company name
+    checks:
+      - name: not_null
   - name: sector
-    type: VARCHAR
+    type: STRING
     description: GICS sector classification
+    checks:
+      - name: not_null
   - name: sub_industry
-    type: VARCHAR
+    type: STRING
     description: GICS sub-industry classification
+    checks:
+      - name: not_null
   - name: total_revenue
-    type: DOUBLE
+    type: FLOAT
     description: Total revenue in USD
+    checks:
+      - name: not_null
   - name: cost_of_revenue
-    type: DOUBLE
+    type: FLOAT
     description: Cost of revenue in USD
   - name: gross_profit
-    type: DOUBLE
+    type: FLOAT
     description: Gross profit in USD
   - name: operating_expense
-    type: DOUBLE
+    type: FLOAT
     description: Operating expenses in USD
   - name: operating_income
-    type: DOUBLE
+    type: FLOAT
     description: Operating income in USD
   - name: net_income
-    type: DOUBLE
+    type: FLOAT
     description: Net income in USD
   - name: basic_eps
-    type: DOUBLE
+    type: FLOAT
     description: Basic earnings per share in USD
   - name: diluted_eps
-    type: DOUBLE
+    type: FLOAT
     description: Diluted earnings per share in USD
   - name: ebitda
-    type: DOUBLE
+    type: FLOAT
     description: EBITDA in USD
   - name: total_assets
-    type: DOUBLE
+    type: FLOAT
     description: Total assets in USD
+    checks:
+      - name: positive
   - name: total_liabilities
-    type: DOUBLE
+    type: FLOAT
     description: Total liabilities in USD
+    checks:
+      - name: non_negative
   - name: stockholders_equity
-    type: DOUBLE
+    type: FLOAT
     description: Stockholders equity in USD
   - name: retained_earnings
-    type: DOUBLE
+    type: FLOAT
     description: Retained earnings in USD
   - name: cash_and_equivalents
-    type: DOUBLE
+    type: FLOAT
     description: Cash and cash equivalents in USD
+    checks:
+      - name: non_negative
   - name: current_debt
-    type: DOUBLE
+    type: FLOAT
     description: Short-term debt in USD
+    checks:
+      - name: non_negative
   - name: long_term_debt
-    type: DOUBLE
+    type: FLOAT
     description: Long-term debt in USD
+    checks:
+      - name: non_negative
   - name: total_debt
-    type: DOUBLE
+    type: FLOAT
     description: Total debt in USD
+    checks:
+      - name: non_negative
   - name: net_debt
-    type: DOUBLE
+    type: FLOAT
     description: Net debt in USD
   - name: shares_outstanding
-    type: DOUBLE
+    type: FLOAT
     description: Ordinary shares outstanding
+    checks:
+      - name: positive
   - name: book_value_per_share
-    type: DOUBLE
+    type: FLOAT
     description: Book value per share (equity / shares outstanding)
   - name: operating_cash_flow
-    type: DOUBLE
+    type: FLOAT
     description: Operating cash flow in USD
   - name: capital_expenditure
-    type: DOUBLE
+    type: FLOAT
     description: Capital expenditure in USD
   - name: free_cash_flow
-    type: DOUBLE
+    type: FLOAT
     description: Free cash flow in USD
   - name: gross_margin_pct
-    type: DOUBLE
+    type: FLOAT
     description: Gross profit margin percentage
+    checks:
+      - name: min
+        value: -100
+      - name: max
+        value: 100
   - name: operating_margin_pct
-    type: DOUBLE
+    type: FLOAT
     description: Operating income margin percentage
+    checks:
+      - name: min
+        value: -1000
+      - name: max
+        value: 200
   - name: net_margin_pct
-    type: DOUBLE
+    type: FLOAT
     description: Net income margin percentage
+    checks:
+      - name: min
+        value: -1000
+      - name: max
+        value: 300
   - name: roe_pct
-    type: DOUBLE
+    type: FLOAT
     description: Return on equity percentage (annualized from quarterly)
   - name: roa_pct
-    type: DOUBLE
+    type: FLOAT
     description: Return on assets percentage (annualized from quarterly)
+    checks:
+      - name: min
+        value: -200
+      - name: max
+        value: 200
   - name: debt_to_equity
-    type: DOUBLE
+    type: FLOAT
     description: Total debt to stockholders equity ratio
+    checks:
+      - name: non_negative
   - name: current_ratio
-    type: DOUBLE
+    type: FLOAT
     description: Current assets to current liabilities ratio
+    checks:
+      - name: positive
   - name: revenue_qoq_pct
-    type: DOUBLE
+    type: FLOAT
     description: Revenue quarter-over-quarter growth percentage
   - name: revenue_yoy_pct
-    type: DOUBLE
+    type: FLOAT
     description: Revenue year-over-year growth percentage
   - name: eps_qoq_pct
-    type: DOUBLE
+    type: FLOAT
     description: Diluted EPS quarter-over-quarter growth percentage
+  - name: interest_expense
+    type: FLOAT
+    description: Interest expense in USD
+    checks:
+      - name: non_negative
+  - name: tax_provision
+    type: FLOAT
+    description: Tax provision (income tax expense) in USD
+  - name: research_and_development
+    type: FLOAT
+    description: Research and development expenses in USD
+    checks:
+      - name: non_negative
+  - name: selling_general_and_administration
+    type: FLOAT
+    description: Selling, general and administrative expenses in USD
+    checks:
+      - name: non_negative
+  - name: diluted_average_shares
+    type: FLOAT
+    description: Weighted average diluted shares outstanding
+    checks:
+      - name: positive
+  - name: current_assets
+    type: FLOAT
+    description: Current assets in USD
+    checks:
+      - name: non_negative
+  - name: current_liabilities
+    type: FLOAT
+    description: Current liabilities in USD
+    checks:
+      - name: non_negative
+  - name: goodwill
+    type: FLOAT
+    description: Goodwill and other intangible assets in USD
+    checks:
+      - name: non_negative
+  - name: net_tangible_assets
+    type: FLOAT
+    description: Net tangible assets (total assets minus intangible assets and goodwill) in USD
+  - name: inventory
+    type: FLOAT
+    description: Inventory value in USD
+    checks:
+      - name: non_negative
+  - name: accounts_receivable
+    type: FLOAT
+    description: Accounts receivable in USD
+    checks:
+      - name: non_negative
+  - name: accounts_payable
+    type: FLOAT
+    description: Accounts payable in USD
+    checks:
+      - name: non_negative
+  - name: working_capital
+    type: FLOAT
+    description: Working capital (current assets minus current liabilities) in USD
+  - name: investing_cash_flow
+    type: FLOAT
+    description: Cash flow from investing activities in USD
+  - name: financing_cash_flow
+    type: FLOAT
+    description: Cash flow from financing activities in USD
+  - name: depreciation_and_amortization
+    type: FLOAT
+    description: Depreciation and amortization expenses in USD
+    checks:
+      - name: non_negative
+  - name: stock_based_compensation
+    type: FLOAT
+    description: Stock-based compensation expense in USD
+    checks:
+      - name: non_negative
+  - name: change_in_working_capital
+    type: FLOAT
+    description: Change in working capital in USD
+  - name: dividends_paid
+    type: FLOAT
+    description: Dividends paid to shareholders in USD (typically negative)
+  - name: share_repurchases
+    type: FLOAT
+    description: Share repurchases (stock buybacks) in USD (typically negative)
 
 @bruin */
 

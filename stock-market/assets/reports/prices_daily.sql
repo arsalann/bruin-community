@@ -1,23 +1,28 @@
 /* @bruin
+
 name: stock_market.prices_daily
 type: bq.sql
-connection: gcp-default
 description: |
   Transforms raw daily stock prices into an analysis-ready table.
   Deduplicates on (ticker, date), adds daily return %, moving averages,
   52-week high/low metrics, and enriches with sector/industry from tickers.
-
-depends:
-  - stock_market_raw.prices_daily
-  - stock_market_raw.tickers
+connection: gcp-default
 
 materialization:
   type: table
   strategy: create+replace
 
+depends:
+  - stock_market_raw.prices_daily
+  - stock_market_raw.tickers
+
+secrets:
+  - key: gcp-default
+    inject_as: gcp-default
+
 columns:
   - name: ticker
-    type: VARCHAR
+    type: STRING
     description: Stock ticker symbol
     primary_key: true
     nullable: false
@@ -27,46 +32,46 @@ columns:
     primary_key: true
     nullable: false
   - name: open
-    type: DOUBLE
+    type: FLOAT
     description: Opening price in USD
   - name: high
-    type: DOUBLE
+    type: FLOAT
     description: Intraday high price in USD
   - name: low
-    type: DOUBLE
+    type: FLOAT
     description: Intraday low price in USD
   - name: close
-    type: DOUBLE
+    type: FLOAT
     description: Closing price in USD
   - name: adj_close
-    type: DOUBLE
+    type: FLOAT
     description: Split and dividend adjusted close price in USD
   - name: volume
     type: INTEGER
     description: Number of shares traded
   - name: daily_return_pct
-    type: DOUBLE
+    type: FLOAT
     description: Daily return percentage based on adjusted close
   - name: sma_5
-    type: DOUBLE
+    type: FLOAT
     description: 5-day simple moving average of adjusted close
   - name: sma_20
-    type: DOUBLE
+    type: FLOAT
     description: 20-day simple moving average of adjusted close
   - name: sma_50
-    type: DOUBLE
+    type: FLOAT
     description: 50-day simple moving average of adjusted close
   - name: sma_200
-    type: DOUBLE
+    type: FLOAT
     description: 200-day simple moving average of adjusted close
   - name: high_52w
-    type: DOUBLE
+    type: FLOAT
     description: 52-week (252 trading day) rolling high of adjusted close
   - name: low_52w
-    type: DOUBLE
+    type: FLOAT
     description: 52-week (252 trading day) rolling low of adjusted close
   - name: pct_from_52w_high
-    type: DOUBLE
+    type: FLOAT
     description: Percentage distance from 52-week high (negative = below high)
   - name: day_of_week
     type: INTEGER
@@ -81,13 +86,13 @@ columns:
     type: INTEGER
     description: Calendar year
   - name: company_name
-    type: VARCHAR
+    type: STRING
     description: Company name from S&P 500 constituents
   - name: sector
-    type: VARCHAR
+    type: STRING
     description: GICS sector classification
   - name: sub_industry
-    type: VARCHAR
+    type: STRING
     description: GICS sub-industry classification
 
 @bruin */

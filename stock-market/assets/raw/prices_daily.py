@@ -1,8 +1,6 @@
 """@bruin
+
 name: stock_market_raw.prices_daily
-type: python
-image: python:3.11
-connection: gcp-default
 description: |
   Fetches daily OHLCV stock prices for S&P 500 constituents via yfinance.
   Uses BRUIN_START_DATE and BRUIN_END_DATE to control the date range.
@@ -10,41 +8,79 @@ description: |
 
   Data source: Yahoo Finance (via yfinance library)
   Limitation: unofficial API, no SLA.
+connection: gcp-default
+tags:
+  - stock-market
+  - financial-data
+  - prices
+  - daily
+  - sp500
+  - raw-data
+  - time-series
 
 materialization:
   type: table
   strategy: append
+image: python:3.11
+
+secrets:
+  - key: gcp-default
+    inject_as: gcp-default
 
 columns:
   - name: ticker
-    type: VARCHAR
+    type: STRING
     description: Stock ticker symbol (Yahoo Finance format)
     primary_key: true
+    checks:
+      - name: not_null
   - name: date
     type: DATE
     description: Trading date
     primary_key: true
+    checks:
+      - name: not_null
   - name: open
-    type: DOUBLE
+    type: FLOAT
     description: Opening price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: high
-    type: DOUBLE
+    type: FLOAT
     description: Intraday high price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: low
-    type: DOUBLE
+    type: FLOAT
     description: Intraday low price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: close
-    type: DOUBLE
+    type: FLOAT
     description: Closing price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: adj_close
-    type: DOUBLE
+    type: FLOAT
     description: Adjusted closing price (accounts for splits and dividends) in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: volume
-    type: INTEGER
+    type: FLOAT
     description: Number of shares traded
+    checks:
+      - name: not_null
+      - name: non_negative
   - name: extracted_at
     type: TIMESTAMP
     description: Timestamp when this data was fetched
+    checks:
+      - name: not_null
 
 @bruin"""
 
