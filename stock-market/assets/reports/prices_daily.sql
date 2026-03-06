@@ -7,6 +7,13 @@ description: |
   Deduplicates on (ticker, date), adds daily return %, moving averages,
   52-week high/low metrics, and enriches with sector/industry from tickers.
 connection: gcp-default
+tags:
+  - finance
+  - stock-market
+  - daily-prices
+  - s&p-500
+  - time-series
+  - trading
 
 materialization:
   type: table
@@ -26,74 +33,165 @@ columns:
     description: Stock ticker symbol
     primary_key: true
     nullable: false
+    checks:
+      - name: not_null
   - name: date
     type: DATE
     description: Trading date
     primary_key: true
     nullable: false
+    checks:
+      - name: not_null
   - name: open
     type: FLOAT
     description: Opening price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: high
     type: FLOAT
     description: Intraday high price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: low
     type: FLOAT
     description: Intraday low price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: close
     type: FLOAT
     description: Closing price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: adj_close
     type: FLOAT
     description: Split and dividend adjusted close price in USD
+    checks:
+      - name: not_null
+      - name: positive
   - name: volume
     type: INTEGER
     description: Number of shares traded
+    checks:
+      - name: not_null
+      - name: non_negative
   - name: daily_return_pct
     type: FLOAT
     description: Daily return percentage based on adjusted close
   - name: sma_5
     type: FLOAT
     description: 5-day simple moving average of adjusted close
+    checks:
+      - name: not_null
+      - name: positive
   - name: sma_20
     type: FLOAT
     description: 20-day simple moving average of adjusted close
+    checks:
+      - name: not_null
+      - name: positive
   - name: sma_50
     type: FLOAT
     description: 50-day simple moving average of adjusted close
+    checks:
+      - name: not_null
+      - name: positive
   - name: sma_200
     type: FLOAT
     description: 200-day simple moving average of adjusted close
+    checks:
+      - name: not_null
+      - name: positive
   - name: high_52w
     type: FLOAT
     description: 52-week (252 trading day) rolling high of adjusted close
+    checks:
+      - name: not_null
+      - name: positive
   - name: low_52w
     type: FLOAT
     description: 52-week (252 trading day) rolling low of adjusted close
+    checks:
+      - name: not_null
+      - name: positive
   - name: pct_from_52w_high
     type: FLOAT
     description: Percentage distance from 52-week high (negative = below high)
+    checks:
+      - name: not_null
+      - name: max
+        value: 0
   - name: day_of_week
     type: INTEGER
     description: Day of week (1=Sunday through 7=Saturday)
+    checks:
+      - name: not_null
+      - name: accepted_values
+        value:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
   - name: month
     type: INTEGER
     description: Month of year (1-12)
+    checks:
+      - name: not_null
+      - name: accepted_values
+        value:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+          - 9
+          - 10
+          - 11
+          - 12
   - name: quarter
     type: INTEGER
     description: Quarter of year (1-4)
+    checks:
+      - name: not_null
+      - name: accepted_values
+        value:
+          - 1
+          - 2
+          - 3
+          - 4
   - name: year
     type: INTEGER
     description: Calendar year
+    checks:
+      - name: not_null
+      - name: min
+        value: 2000
+      - name: max
+        value: 2030
   - name: company_name
     type: STRING
     description: Company name from S&P 500 constituents
+    checks:
+      - name: not_null
   - name: sector
     type: STRING
     description: GICS sector classification
+    checks:
+      - name: not_null
   - name: sub_industry
     type: STRING
     description: GICS sub-industry classification
+    checks:
+      - name: not_null
 
 @bruin */
 

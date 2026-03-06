@@ -9,6 +9,12 @@ description: |
   Data source: Yahoo Finance (via yfinance library)
   Limitation: yfinance typically returns the last 4-5 quarters of data.
 connection: gcp-default
+tags:
+  - financial-data
+  - income-statement
+  - sp500
+  - quarterly
+  - yahoo-finance
 
 materialization:
   type: table
@@ -18,13 +24,6 @@ image: python:3.11
 secrets:
   - key: gcp-default
     inject_as: gcp-default
-
-tags:
-  - financial-data
-  - income-statement
-  - sp500
-  - quarterly
-  - yahoo-finance
 
 columns:
   - name: ticker
@@ -225,8 +224,10 @@ columns:
       - name: non_negative
   - name: operating_revenue
     type: FLOAT
+    description: Revenue from core operating activities in USD
   - name: write_off
     type: FLOAT
+    description: Asset write-offs and impairments in USD
   - name: depreciation_amortization_depletion_income_statement
     type: FLOAT
     description: Combined depreciation, amortization and depletion from income statement in USD

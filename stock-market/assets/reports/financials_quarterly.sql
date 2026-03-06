@@ -7,6 +7,14 @@ description: |
   into a single analysis-ready table. Adds derived financial ratios including
   margins, returns, leverage, and growth metrics. Enriched with sector/industry.
 connection: gcp-default
+tags:
+  - finance
+  - financials
+  - quarterly
+  - fundamental_analysis
+  - equity_research
+  - financial_reporting
+  - public_companies
 
 materialization:
   type: table
@@ -21,15 +29,6 @@ depends:
 secrets:
   - key: gcp-default
     inject_as: gcp-default
-
-tags:
-  - finance
-  - financials
-  - quarterly
-  - fundamental_analysis
-  - equity_research
-  - financial_reporting
-  - public_companies
 
 columns:
   - name: ticker

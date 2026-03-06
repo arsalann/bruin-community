@@ -9,7 +9,6 @@ description: |
   Data source: Yahoo Finance (via yfinance library)
   Limitation: yfinance typically returns the last 4-5 quarters of data.
 connection: gcp-default
-
 tags:
   - financial
   - balance_sheet
@@ -525,80 +524,180 @@ columns:
       - name: non_negative
   - name: cash_equivalents
     type: FLOAT
+    description: Highly liquid short-term investments equivalent to cash in USD
+    checks:
+      - name: non_negative
   - name: cash_financial
     type: FLOAT
+    description: Cash and cash equivalents for financial institutions in USD
+    checks:
+      - name: non_negative
   - name: dueto_related_parties_current
     type: FLOAT
+    description: Current amounts owed to related parties in USD
+    checks:
+      - name: non_negative
   - name: duefrom_related_parties_current
     type: FLOAT
+    description: Current amounts owed by related parties in USD
+    checks:
+      - name: non_negative
   - name: preferred_securities_outside_stock_equity
     type: FLOAT
+    description: Preferred securities not included in stockholders equity in USD
+    checks:
+      - name: non_negative
   - name: interest_payable
     type: FLOAT
+    description: Accrued interest payable on debt in USD
+    checks:
+      - name: non_negative
   - name: non_current_note_receivables
     type: FLOAT
+    description: Long-term notes receivable in USD
+    checks:
+      - name: non_negative
   - name: investments_in_other_ventures_under_equity_method
     type: FLOAT
+    description: Equity method investments in joint ventures and associates in USD
+    checks:
+      - name: non_negative
   - name: investmentsin_associatesat_cost
     type: FLOAT
+    description: Cost-method investments in associate companies in USD
+    checks:
+      - name: non_negative
   - name: restricted_cash
     type: FLOAT
+    description: Cash restricted for specific purposes or by agreements in USD
+    checks:
+      - name: non_negative
   - name: foreign_currency_translation_adjustments
     type: FLOAT
+    description: Cumulative foreign currency translation adjustments in USD
   - name: minimum_pension_liabilities
     type: FLOAT
+    description: Minimum pension liability adjustments in USD
   - name: unrealized_gain_loss
     type: FLOAT
+    description: Unrealized gains or losses on investments in USD
   - name: current_notes_payable
     type: FLOAT
+    description: Short-term notes payable in USD
+    checks:
+      - name: non_negative
   - name: loans_receivable
     type: FLOAT
+    description: Loans made to other parties receivable in USD
+    checks:
+      - name: non_negative
   - name: derivative_product_liabilities
     type: FLOAT
+    description: Liabilities from derivative financial instruments in USD
   - name: line_of_credit
     type: FLOAT
+    description: Outstanding amounts drawn on lines of credit in USD
   - name: non_current_prepaid_assets
     type: FLOAT
+    description: Long-term prepaid assets in USD
+    checks:
+      - name: non_negative
   - name: financial_assets
     type: FLOAT
+    description: Financial assets at fair value in USD
+    checks:
+      - name: non_negative
   - name: current_deferred_assets
     type: FLOAT
+    description: Current portion of deferred tax and other assets in USD
+    checks:
+      - name: non_negative
   - name: taxes_receivable
     type: FLOAT
+    description: Tax refunds and overpayments receivable in USD
+    checks:
+      - name: non_negative
   - name: receivables_adjustments_allowances
     type: FLOAT
+    description: Adjustments and allowances against receivables (typically negative) in USD
   - name: preferred_stock_equity
     type: FLOAT
+    description: Preferred stockholders equity in USD
+    checks:
+      - name: non_negative
   - name: investmentsin_joint_venturesat_cost
     type: FLOAT
+    description: Cost-method investments in joint ventures in USD
+    checks:
+      - name: non_negative
   - name: investment_properties
     type: FLOAT
+    description: Real estate held for investment purposes in USD
+    checks:
+      - name: non_negative
   - name: notes_receivable
     type: FLOAT
+    description: Promissory notes receivable from third parties in USD
+    checks:
+      - name: non_negative
   - name: preferred_shares_number
     type: FLOAT
+    description: Number of preferred shares outstanding
+    checks:
+      - name: non_negative
   - name: other_inventories
     type: FLOAT
+    description: Inventory not categorized elsewhere in USD
   - name: cash_cash_equivalents_and_federal_funds_sold
     type: FLOAT
+    description: Cash, cash equivalents and federal funds sold (banking) in USD
+    checks:
+      - name: non_negative
   - name: non_current_accrued_expenses
     type: FLOAT
+    description: Long-term accrued expenses in USD
+    checks:
+      - name: non_negative
   - name: held_to_maturity_securities
     type: FLOAT
+    description: Securities held to maturity at amortized cost in USD
+    checks:
+      - name: non_negative
   - name: trading_securities
     type: FLOAT
+    description: Securities held for trading at fair value in USD
+    checks:
+      - name: non_negative
   - name: financial_assets_designatedas_fair_value_through_profitor_loss_total
     type: FLOAT
+    description: Financial assets designated at fair value through profit or loss in USD
+    checks:
+      - name: non_negative
   - name: dueto_related_parties_non_current
     type: FLOAT
+    description: Long-term amounts owed to related parties in USD
+    checks:
+      - name: non_negative
   - name: investmentsin_subsidiariesat_cost
     type: FLOAT
+    description: Cost-method investments in subsidiary companies in USD
+    checks:
+      - name: non_negative
   - name: current_deferred_taxes_assets
     type: FLOAT
+    description: Current portion of deferred tax assets in USD
+    checks:
+      - name: non_negative
   - name: accrued_interest_receivable
     type: FLOAT
+    description: Interest earned but not yet received in USD
+    checks:
+      - name: non_negative
   - name: duefrom_related_parties_non_current
     type: FLOAT
+    description: Long-term amounts owed by related parties in USD
+    checks:
+      - name: non_negative
 
 @bruin"""
 
