@@ -193,6 +193,11 @@ columns:
     checks:
       - name: not_null
 
+custom_checks:
+  - name: no duplicate ticker-date pairs
+    query: SELECT ticker, date FROM stock_market.prices_daily GROUP BY ticker, date HAVING COUNT(*) > 1
+    count: 0
+
 @bruin */
 
 WITH deduped AS (
@@ -202,6 +207,12 @@ WITH deduped AS (
       AND close IS NOT NULL
       AND close > 0
     QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker, date ORDER BY extracted_at DESC) = 1
+),
+
+tickers AS (
+    SELECT *
+    FROM stock_market_raw.tickers
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY extracted_at DESC) = 1
 ),
 
 enriched AS (
@@ -255,7 +266,7 @@ enriched AS (
         t.sub_industry
 
     FROM deduped p
-    LEFT JOIN stock_market_raw.tickers t ON p.ticker = t.ticker
+    LEFT JOIN tickers t ON p.ticker = t.ticker
 )
 
 SELECT

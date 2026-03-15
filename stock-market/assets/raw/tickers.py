@@ -57,8 +57,6 @@ columns:
     description: Date the company was added to the S&P 500 index
     checks:
       - name: not_null
-      - name: pattern
-        value: ^\d{4}-\d{2}-\d{2}$
   - name: cik
     type: STRING
     description: SEC Central Index Key

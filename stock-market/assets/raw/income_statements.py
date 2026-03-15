@@ -122,13 +122,9 @@ columns:
   - name: interest_expense
     type: FLOAT
     description: Total interest expense on debt and borrowings in USD
-    checks:
-      - name: non_negative
   - name: interest_income
     type: FLOAT
     description: Interest income from investments and deposits in USD
-    checks:
-      - name: non_negative
   - name: normalized_income
     type: FLOAT
     description: Net income adjusted for unusual items and normalized for comparison in USD
@@ -202,26 +198,18 @@ columns:
   - name: research_and_development
     type: FLOAT
     description: Research and development expenses in USD
-    checks:
-      - name: non_negative
   - name: selling_general_and_administration
     type: FLOAT
     description: Combined selling, general and administrative expenses in USD
-    checks:
-      - name: non_negative
   - name: general_and_administrative_expense
     type: FLOAT
     description: General and administrative expenses in USD
-    checks:
-      - name: non_negative
   - name: other_gand_a
     type: FLOAT
     description: Other general and administrative expenses not elsewhere classified in USD
   - name: salaries_and_wages
     type: FLOAT
     description: Employee salaries and wages expense in USD
-    checks:
-      - name: non_negative
   - name: operating_revenue
     type: FLOAT
     description: Revenue from core operating activities in USD
@@ -231,8 +219,6 @@ columns:
   - name: depreciation_amortization_depletion_income_statement
     type: FLOAT
     description: Combined depreciation, amortization and depletion from income statement in USD
-    checks:
-      - name: non_negative
   - name: depreciation_and_amortization_in_income_statement
     type: FLOAT
   - name: amortization

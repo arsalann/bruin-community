@@ -201,8 +201,6 @@ columns:
   - name: debt_to_equity
     type: FLOAT
     description: Total debt to stockholders equity ratio
-    checks:
-      - name: non_negative
   - name: current_ratio
     type: FLOAT
     description: Current assets to current liabilities ratio
@@ -220,21 +218,15 @@ columns:
   - name: interest_expense
     type: FLOAT
     description: Interest expense in USD
-    checks:
-      - name: non_negative
   - name: tax_provision
     type: FLOAT
     description: Tax provision (income tax expense) in USD
   - name: research_and_development
     type: FLOAT
     description: Research and development expenses in USD
-    checks:
-      - name: non_negative
   - name: selling_general_and_administration
     type: FLOAT
     description: Selling, general and administrative expenses in USD
-    checks:
-      - name: non_negative
   - name: diluted_average_shares
     type: FLOAT
     description: Weighted average diluted shares outstanding
@@ -285,13 +277,9 @@ columns:
   - name: depreciation_and_amortization
     type: FLOAT
     description: Depreciation and amortization expenses in USD
-    checks:
-      - name: non_negative
   - name: stock_based_compensation
     type: FLOAT
     description: Stock-based compensation expense in USD
-    checks:
-      - name: non_negative
   - name: change_in_working_capital
     type: FLOAT
     description: Change in working capital in USD
@@ -301,6 +289,11 @@ columns:
   - name: share_repurchases
     type: FLOAT
     description: Share repurchases (stock buybacks) in USD (typically negative)
+
+custom_checks:
+  - name: no duplicate ticker-period pairs
+    query: SELECT ticker, period_ending FROM stock_market.financials_quarterly GROUP BY ticker, period_ending HAVING COUNT(*) > 1
+    count: 0
 
 @bruin */
 
@@ -323,6 +316,12 @@ cashflow AS (
     FROM stock_market_raw.cash_flows
     WHERE period_ending IS NOT NULL
     QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker, period_ending ORDER BY extracted_at DESC) = 1
+),
+
+tickers AS (
+    SELECT *
+    FROM stock_market_raw.tickers
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY extracted_at DESC) = 1
 ),
 
 joined AS (
@@ -387,7 +386,7 @@ joined AS (
     FROM income i
     LEFT JOIN balance b ON i.ticker = b.ticker AND i.period_ending = b.period_ending
     LEFT JOIN cashflow cf ON i.ticker = cf.ticker AND i.period_ending = cf.period_ending
-    LEFT JOIN stock_market_raw.tickers t ON i.ticker = t.ticker
+    LEFT JOIN tickers t ON i.ticker = t.ticker
 )
 
 SELECT

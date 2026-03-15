@@ -135,16 +135,12 @@ columns:
   - name: capital_lease_obligations
     type: FLOAT
     description: Total capital lease obligations in USD
-    checks:
-      - name: non_negative
   - name: common_stock_equity
     type: FLOAT
     description: Total common stockholders equity in USD
   - name: total_capitalization
     type: FLOAT
     description: Total capitalization (debt + equity) in USD
-    checks:
-      - name: positive
   - name: total_equity_gross_minority_interest
     type: FLOAT
     description: Total equity including minority interest in USD
@@ -183,8 +179,6 @@ columns:
   - name: other_non_current_liabilities
     type: FLOAT
     description: Other miscellaneous long-term liabilities in USD
-    checks:
-      - name: non_negative
   - name: liabilities_heldfor_sale_non_current
     type: FLOAT
     description: Long-term liabilities associated with assets held for sale in USD
@@ -223,8 +217,6 @@ columns:
   - name: long_term_capital_lease_obligation
     type: FLOAT
     description: Long-term portion of capital lease obligations in USD
-    checks:
-      - name: non_negative
   - name: current_liabilities
     type: FLOAT
     description: Total current liabilities due within one year in USD

@@ -190,6 +190,8 @@ def materialize():
     keep_cols = ["ticker", "date", "open", "high", "low", "close", "adj_close", "volume"]
     df = df[[c for c in keep_cols if c in df.columns]]
     df["date"] = pd.to_datetime(df["date"]).dt.date
+    if "volume" in df.columns:
+        df["volume"] = df["volume"].astype(float)
     df["extracted_at"] = datetime.now(timezone.utc)
 
     logger.info(
