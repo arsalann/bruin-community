@@ -1,0 +1,2 @@
+reportlab
+slack_sdk

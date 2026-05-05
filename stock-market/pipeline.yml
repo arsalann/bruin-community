@@ -1,5 +1,5 @@
 name: stock-market
-schedule: daily
+schedule: "0 6 * * *"
 start_date: "2020-01-01"
 
 default_connections:
