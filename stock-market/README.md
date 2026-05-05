@@ -7,7 +7,7 @@ Tracks daily stock prices and quarterly financial statements for S&P 500 compani
 - **Ticker universe**: Current S&P 500 constituents (~500 tickers), sourced from Wikipedia.
 - **Daily prices**: Open, high, low, close, adjusted close, and volume via yfinance.
 - **Quarterly financials**: Income statements, balance sheets, and cash flow statements via yfinance (last ~4–5 quarters per ticker).
-- **Schedule**: Runs daily to capture new price data and any newly available quarterly reports.
+- **Schedule**: Runs daily at **06:00 UTC** to capture new price data, refresh report tables, and send the daily AAPL/MSFT stock summary to Slack.
 
 ## Data Sources
 
@@ -26,8 +26,8 @@ No paid API key is required. All data is fetched from free, public sources.
 | Setting            | Value                                  |
 | ------------------ | -------------------------------------- |
 | Name               | `stock-market`                         |
-| Schedule           | `daily`                                |
-| Start date         | `2000-01-01`                           |
+| Schedule           | `0 6 * * *`                            |
+| Start date         | `2020-01-01`                           |
 | Default connection | `google_cloud_platform: "gcp-default"` |
 | Asset connection   | `gcp-default` (BigQuery)  |
 
@@ -53,6 +53,13 @@ No paid API key is required. All data is fetched from free, public sources.
 | ----------------------------------- | ---------------------------------- | ---------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `stock_market.prices_daily`         | `reports/prices_daily.sql`         | `create+replace` | `raw_prices_daily`, `raw_tickers`                                              | Deduped daily prices with daily return %, 5/20/50/200-day SMAs, 52-week high/low, distance from 52-week high, calendar fields, and sector/industry enrichment                                     |
 | `stock_market.financials_quarterly` | `reports/financials_quarterly.sql` | `create+replace` | `raw_income_statements`, `raw_balance_sheets`, `raw_cash_flows`, `raw_tickers` | Joined income + balance sheet + cash flow with derived ratios: gross/operating/net margins, ROE, ROA, debt-to-equity, current ratio, revenue QoQ/YoY growth, EPS QoQ growth, book value per share |
+
+### Delivery (Python automation)
+
+
+| Asset                                   | File                                      | Depends On                  | Description                                                                                                                                          |
+| --------------------------------------- | ----------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ops.daily_stock_summary_slack_report`  | `delivery/daily_stock_summary_slack_report.py` | `stock_market.prices_daily` | Queries the latest completed trading day before the run date for AAPL and MSFT, renders a one-page PDF summary, and posts the message + PDF to Slack. |
 
 
 ## Processing Details
@@ -81,6 +88,13 @@ lxml
 requests
 ```
 
+Python packages required by the delivery asset (`delivery/requirements.txt`):
+
+```
+reportlab
+slack_sdk
+```
+
 ## Environment Variables
 
 
@@ -90,6 +104,15 @@ requests
 | `BRUIN_END_DATE`     | End of price ingestion window (YYYY-MM-DD). Default: `2020-01-03`     |
 | `STOCK_TICKER_LIMIT` | Optional. Limits the number of tickers processed (useful for testing) |
 | `LOG_LEVEL`          | Optional. Logging level (default: `INFO`)                             |
+
+Additional environment variables for the Slack delivery asset:
+
+| Variable                    | Description                                                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `SLACK_BOT_TOKEN`           | Required for live Slack delivery. Bot token used to upload the PDF and post the report message.                   |
+| `SLACK_CHANNEL_ID`          | Required for live Slack delivery. Target Slack channel ID that receives the daily stock report.                   |
+| `STOCK_REPORT_SLACK_DRY_RUN`| Optional. Set to `1` to skip the Slack upload and only print the message locally. Useful for local verification. |
+| `STOCK_REPORT_OUTPUT_DIR`   | Optional. If set, writes a copy of the generated PDF into that directory.                                          |
 
 
 ## Running
@@ -117,6 +140,9 @@ bruin run stock-market/assets/raw/raw_cash_flows.py
 # Build report tables
 bruin run stock-market/assets/reports/prices_daily.sql
 bruin run stock-market/assets/reports/financials_quarterly.sql
+
+# Run the Slack/PDF delivery asset without posting to Slack
+STOCK_REPORT_SLACK_DRY_RUN=1 bruin run stock-market/assets/delivery/daily_stock_summary_slack_report.py
 ```
 
 ## Limitations
@@ -125,4 +151,3 @@ bruin run stock-market/assets/reports/financials_quarterly.sql
 - Quarterly financials from yfinance typically cover only the **last 4–5 quarters**, not full history.
 - Ticker universe reflects **current** S&P 500 membership only (survivorship bias — delisted companies are not included).
 - Financial statement fields returned by yfinance may vary by company; the pipeline captures all available columns and converts them to snake_case.
-
